@@ -23,6 +23,22 @@ for ($i = 1; $i <= 100; $i++) {
 }
 `
 
+let fizzbuzz-w5 = `<?php
+for($i
+=1;$i
+<=100;
+$i++){
+echo(
+$i%3?
+'':
+'Fizz'
+).($i%
+5?'':
+'Buzz'
+)?:$i,
+"\n";}
+`
+
 let fizzbuzz-0 = `<?php
 for ($i = 1; $i <= 100; $i++) {
   echo ($i%3?'':'Fizz') . ($i%5?'':'Buzz') ?: $i, "\n";
@@ -63,14 +79,6 @@ echo $result;
 `#
 
 let string-xor-fizz = `<?php
-$a = "L\n[p";
-$b = "\nc!\n";
-echo $a ^ $b;
-// => Fizz
-
-`#
-
-let string-xor-fizz-2 = `<?php
 echo (
 "L
 [p
@@ -219,40 +227,34 @@ document '<
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-  +frame{FizzBuzzとは}<
+  +frame{細長いFizzBuzz？}<
+    +code-block-php(fizzbuzz-normal);
+  >
+
+  +frame{細長いFizzBuzz？}<
     +code-block-php(fizzbuzz-normal);
     +p{
-      1から100までの数について、3の倍数ならFizz、5の倍数ならBuzz、15の倍数ならFizzBuzz、それ以外はその数そのものを出力するプログラム
+      \emph{1行あたりの最大文字数}を最小化しよう
     }
   >
 
-  +frame{FizzBuzzとは}<
-    +code-block-php(fizzbuzz-normal);
-    +p{
-      1行あたりの最大文字数は？
-    }
-    +p{
-      \inline-code(`if`);を並べている行が46文字で最大
-    }
+  +frame{1行あたり最大6文字で書いたFizzBuzz}<
+    +code-block-php(fizzbuzz-w5);
   >
 
-  +frame{FizzBuzzとは}<
-    +code-block-php(fizzbuzz-normal);
-    +p{
-      1行あたりの最大文字数は？
-    }
-    +p{
-      \inline-code(`if`);を並べている行が46文字で最大
-    }
-    +p{
-      これを\emph{最小化}したい！
-    }
-  >
-
-  +frame{細長いFizzBuzz}<
+  +frame{細長いFizzBuzz？}<
     +fig-center(vconcat [
       gap 100pt;
-      textbox{1行あたり\emph{2文字}あれば、FizzBuzzが書ける！}
+      textbox{1行何文字あればFizzBuzzが書けるのか？};
+    ]);
+  >
+
+  +frame{細長いFizzBuzz？}<
+    +fig-center(vconcat ?:(align-center) [
+      gap 100pt;
+      textbox{1行何文字あればFizzBuzzが書けるのか？};
+      gap 20pt;
+      textbox{\emph{2文字}あれば書ける！};
     ]);
   >
 
@@ -264,22 +266,28 @@ document '<
     }
     +listing{
       * ほとんどのキーワードが書けない
-        ** \inline-code(`as`);、\inline-code(`do`);、\inline-code(`fn`);、\inline-code(`if`);、\inline-code(`or`);
+        ** 書けるのは\inline-code(`as`);、\inline-code(`do`);、\inline-code(`fn`);、\inline-code(`if`);、\inline-code(`or`);のみ
       * ほとんどの関数が呼べない
-        ** \inline-code(`_()`); (\inline-code(`gettext()`);の別名)、\inline-code(`pi()`);
-      * 文字列が書けない
+        ** 呼べるのは\inline-code(`_`); (\inline-code(`gettext`);の別名)、\inline-code(`pi`);のみ
+      * 空でない文字列が書けない
         ** クォート、中身の文字、クォート、で最低3文字必要
+    }
+    +p{
+      ではどうするか？
     }
   >
 
   +frame{FizzBuzzを細長くする}<
     +code-block-php(fizzbuzz-0);
+    +p{
+      このFizzBuzzをベースに変形する
+    }
   >
 
   +frame{FizzBuzzを細長くする}<
     +code-block-php(fizzbuzz-0);
     +p{
-      ステップ1: 絶対に短縮できない、\emph{キーワード}を排除する
+      ステップ1: 絶対に短縮できない、\emph{キーワードを排除}する
     }
     +p{
       \inline-code(`for`);と\inline-code(`echo`);を消す
@@ -289,8 +297,8 @@ document '<
   +frame{FizzBuzzを細長くする}<
     +code-block-php(fizzbuzz-1);
     +listing{
-      * \inline-code(`for`);は\inline-code(`array_walk()`);と\inline-code(`range()`);に
-      * \inline-code(`echo`);は\inline-code(`pritnf()`);に
+      * \inline-code(`for`);は\inline-code(`array_walk`);と\inline-code(`range`);に
+      * \inline-code(`echo`);は\inline-code(`pritnf`);に
       * \inline-code(`<?php`);は\inline-code(`<?`);に (要: \inline-code(`short_open_tag`);オプション)
     }
   >
@@ -326,48 +334,18 @@ document '<
     }
   >
 
-  +frame{余談: PHP 8 系で動かなくてもいいなら}<
-    +code-block-php(`$f
-=F
-.i
-.z
-.z
-;
-`);
-    +p{
-      未定義の定数が評価されると、その定数の名前の文字列になる (PHP 7.x 以下)
-    }
-  >
-
-  +frame{余談: PHP 8 系で動かなくてもいいなら}<
-    +code-block-php(`$f
-=@
-F.
-@i
-.
-@z
-.
-@z
-;
-`);
-    +p{
-      警告を抑制するため、\inline-code(`@`);演算子を使う
-    }
-  >
-
   +frame{文字列リテラルの短縮}<
     +code-block-php(string-xor);
     +p{
       文字列の XOR 演算を使う
     }
+    +p{
+      文字列をバイト列と見做し、各要素にXOR演算を適用して結合する
+    }
   >
 
   +frame{文字列リテラルの短縮}<
     +code-block-php(string-xor-fizz);
-  >
-
-  +frame{文字列リテラルの短縮}<
-    +code-block-php(string-xor-fizz-2);
     +p{
       ほとんどの文字列を、1行2文字以下で表せる
     }
@@ -429,7 +407,7 @@ F.
       gap 50pt;
       textbox{任意のプログラムを動かせる！};
       gap 20pt;
-      textbox{\emph{Laravel}を動かせる！};
+      textbox{\emph{Laravel}でも動かせる};
     ]);
   >
 
@@ -438,7 +416,14 @@ F.
       gap 100pt;
       textbox{任意のプログラムを動かそうとしたときの壁};
       gap 20pt;
-      textbox{\inline-code(`eval()`);は関数ではない};
+      textbox{\inline-code(`eval`);は関数ではないので、variable functionが使えない};
+    ]);
+  >
+
+  +frame{そしてその先へ......}<
+    +fig-center(vconcat ?:(align-center) [
+      gap 100pt;
+      textbox{ではどうやってLaravelを動かすか？};
     ]);
   >
 
@@ -447,5 +432,36 @@ F.
       gap 100pt;
       textbox{続きは\emph{PHPerKaigi 2023}で};
     ]);
+  >
+
+  +section{|没スライド|}<
+    +frame{余談: PHP 8 系で動かなくてもいいなら}<
+      +code-block-php(`$f
+=F
+.i
+.z
+.z
+;
+`);
+      +p{
+        未定義の定数が評価されると、その定数の名前の文字列になる (PHP 7.x 以下)
+      }
+    >
+
+    +frame{余談: PHP 8 系で動かなくてもいいなら}<
+      +code-block-php(`$f
+=@
+F.
+@i
+.
+@z
+.
+@z
+;
+`);
+      +p{
+        警告を抑制するため、\inline-code(`@`);演算子を使う
+      }
+    >
   >
 >
