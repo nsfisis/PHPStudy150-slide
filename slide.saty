@@ -1,0 +1,451 @@
+@require: class-slydifi/theme/akasaka
+@require: code-printer/code-design
+@require: code-printer/code-printer
+@require: code-printer/code-syntax
+@require: code-printer/code-theme
+@require: figbox/figbox
+
+let-block +code-block-php source =
+  '<
+    +code-printer?:(
+      CodePrinter.make-config CodeSyntax.php CodeTheme.iceberg-light
+      |> CodePrinter.set-number-fun CodeDesign.number-fun-null
+    )(source);
+  >
+
+let fizzbuzz-normal = `<?php
+
+for ($i = 1; $i <= 100; $i++) {
+  if ($i % 15 === 0) echo 'FizzBuzz', PHP_EOL;
+  else if ($i % 3 === 0) echo 'Fizz', PHP_EOL;
+  else if ($i % 5 === 0) echo 'Buzz', PHP_EOL;
+  else echo $i, PHP_EOL;
+}
+`
+
+let fizzbuzz-0 = `<?php
+for ($i = 1; $i <= 100; $i++) {
+  echo ($i%3?'':'Fizz') . ($i%5?'':'Buzz') ?: $i, "\n";
+}
+`
+
+let fizzbuzz-1 = `<?
+$a = range(1, 100);
+array_walk(
+  $a,
+  fn($i) => printf(
+    (($i%3?'':'Fizz') . ($i%5?'':'Buzz') ?: $i)
+    . "\n"),
+);
+`
+
+let fizzbuzz-2 = `<?
+$r = 'range'; $w = 'array_walk'; $p = 'printf';
+$f = 'Fizz'; $b = 'Buzz';
+$a = $r(1, 10*10);
+$w($a,
+  fn($i) => $p(
+    (($i%3?'':$f) . ($i%5?'':$b) ?: $i) . "
+"));
+`
+
+let string-xor = `<?php
+$a = "12345";
+$b = "world";
+// $a ^ $b は次のコードと同じ
+$result = '';
+for ($i = 0; $i < min(strlen($a), strlen($b)); $i++) {
+  $result .= $a[$i] ^ $b[$i];
+}
+echo $result;
+// => F]AXQ
+
+`#
+
+let string-xor-fizz = `<?php
+$a = "L\n[p";
+$b = "\nc!\n";
+echo $a ^ $b;
+// => Fizz
+
+`#
+
+let string-xor-fizz-2 = `<?php
+echo (
+"L
+[p
+"^
+"
+c!
+"
+);
+// => Fizz
+
+`#
+
+let fizzbuzz-stretched-1 = `<?
+$a
+=(
+'x
+Om
+'^
+('
+k!
+o'
+))
+(1
+,
+10
+`
+
+let fizzbuzz-stretched-2 = `*
+10
+);
+('
+x!
+s!
+k!
+'^
+'k
+Sk
+~}
+Ma
+')
+`
+
+let fizzbuzz-stretched-3 = `(
+$a
+,
+fn
+(
+$i
+)
+=>
+('
+x!
+~!
+'^
+'z
+`
+
+let fizzbuzz-stretched-4 = `Hd
+G'
+)(
+((
+$i
+%3
+?
+''
+:'
+c!
+'^
+'L
+[p
+`
+
+let fizzbuzz-stretched-5 = `')
+.(
+$i
+%5
+?
+''
+:(
+'H
+'^
+('
+')
+).
+('
+`
+
+let fizzbuzz-stretched-6 = `b!
+'^
+'i
+S'
+)(
+3*
+3*
+13
+).
+('
+p'
+^
+'p
+`
+
+let fizzbuzz-stretched-7 = `')
+)?
+:
+$i
+).
+"
+")
+);
+`
+
+open FigBox
+in
+
+document '<
+  +set-config(|
+    SlydifiThemeAkasaka.default-config with
+    color-emph = Color.black;
+  |);
+
+  +make-title(|
+    title = {
+      |明日のあなたの役に立たない
+      |PHPコーディング技法
+      |～細長いFizzBuzzを書く～
+      |};
+    author = {|nsfisis (いまむら)|};
+    date = {|第150回PHP勉強会＠東京|};
+  |);
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  +frame{自己紹介}<
+    +fig-center(vconcat [
+      gap 75pt;
+      hconcat [
+        textbox{nsfisis (いまむら)};
+        gap 20pt;
+        include-image 50pt `assets/me.jpeg`;
+      ];
+      gap 20pt;
+      textbox{\@ デジタルサーカス株式会社};
+    ]);
+  >
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  +frame{FizzBuzzとは}<
+    +code-block-php(fizzbuzz-normal);
+    +p{
+      1から100までの数について、3の倍数ならFizz、5の倍数ならBuzz、15の倍数ならFizzBuzz、それ以外はその数そのものを出力するプログラム
+    }
+  >
+
+  +frame{FizzBuzzとは}<
+    +code-block-php(fizzbuzz-normal);
+    +p{
+      1行あたりの最大文字数は？
+    }
+    +p{
+      \inline-code(`if`);を並べている行が46文字で最大
+    }
+  >
+
+  +frame{FizzBuzzとは}<
+    +code-block-php(fizzbuzz-normal);
+    +p{
+      1行あたりの最大文字数は？
+    }
+    +p{
+      \inline-code(`if`);を並べている行が46文字で最大
+    }
+    +p{
+      これを\emph{最小化}したい！
+    }
+  >
+
+  +frame{細長いFizzBuzz}<
+    +fig-center(vconcat [
+      gap 100pt;
+      textbox{1行あたり\emph{2文字}あれば、FizzBuzzが書ける！}
+    ]);
+  >
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  +frame{何が難しいのか？}<
+    +p{
+      2文字までのトークンしか使えない
+    }
+    +listing{
+      * ほとんどのキーワードが書けない
+        ** \inline-code(`as`);、\inline-code(`do`);、\inline-code(`fn`);、\inline-code(`if`);、\inline-code(`or`);
+      * ほとんどの関数が呼べない
+        ** \inline-code(`_()`); (\inline-code(`gettext()`);の別名)、\inline-code(`pi()`);
+      * 文字列が書けない
+        ** クォート、中身の文字、クォート、で最低3文字必要
+    }
+  >
+
+  +frame{FizzBuzzを細長くする}<
+    +code-block-php(fizzbuzz-0);
+  >
+
+  +frame{FizzBuzzを細長くする}<
+    +code-block-php(fizzbuzz-0);
+    +p{
+      ステップ1: 絶対に短縮できない、\emph{キーワード}を排除する
+    }
+    +p{
+      \inline-code(`for`);と\inline-code(`echo`);を消す
+    }
+  >
+
+  +frame{FizzBuzzを細長くする}<
+    +code-block-php(fizzbuzz-1);
+    +listing{
+      * \inline-code(`for`);は\inline-code(`array_walk()`);と\inline-code(`range()`);に
+      * \inline-code(`echo`);は\inline-code(`pritnf()`);に
+      * \inline-code(`<?php`);は\inline-code(`<?`);に (要: \inline-code(`short_open_tag`);オプション)
+    }
+  >
+
+  +frame{FizzBuzzを細長くする}<
+    +code-block-php(fizzbuzz-1);
+    +p{
+      さっきよりも長くなってない？
+    }
+  >
+
+  +frame{FizzBuzzを細長くする}<
+    +code-block-php(fizzbuzz-1);
+    +p{
+      ステップ2: 関数呼び出しをvariable function経由に
+    }
+  >
+
+  +frame{FizzBuzzを細長くする}<
+    +code-block-php(fizzbuzz-2);
+    +listing{
+      * 関数名とFizz、Buzzを変数に代入
+      * \inline-code(`100`);を\inline-code(`10*10`);に
+      * \inline-code(`"\n"`);を使わず、直接改行を挿入
+      * 上を無視すれば、2文字以下のトークンだけで構成されている
+    }
+  >
+
+  +frame{FizzBuzzを細長くする}<
+    +code-block-php(fizzbuzz-2);
+    +p{
+      ステップ3: 文字列を幅2文字以下で生成する
+    }
+  >
+
+  +frame{余談: PHP 8 系で動かなくてもいいなら}<
+    +code-block-php(`$f
+=F
+.i
+.z
+.z
+;
+`);
+    +p{
+      未定義の定数が評価されると、その定数の名前の文字列になる (PHP 7.x 以下)
+    }
+  >
+
+  +frame{余談: PHP 8 系で動かなくてもいいなら}<
+    +code-block-php(`$f
+=@
+F.
+@i
+.
+@z
+.
+@z
+;
+`);
+    +p{
+      警告を抑制するため、\inline-code(`@`);演算子を使う
+    }
+  >
+
+  +frame{文字列リテラルの短縮}<
+    +code-block-php(string-xor);
+    +p{
+      文字列の XOR 演算を使う
+    }
+  >
+
+  +frame{文字列リテラルの短縮}<
+    +code-block-php(string-xor-fizz);
+  >
+
+  +frame{文字列リテラルの短縮}<
+    +code-block-php(string-xor-fizz-2);
+    +p{
+      ほとんどの文字列を、1行2文字以下で表せる
+    }
+  >
+
+  +frame{細長いFizzBuzz完成}<
+    +code-block-php(fizzbuzz-stretched-1);
+  >
+
+  +frame{細長いFizzBuzz完成}<
+    +code-block-php(fizzbuzz-stretched-2);
+  >
+
+  +frame{細長いFizzBuzz完成}<
+    +code-block-php(fizzbuzz-stretched-3);
+  >
+
+  +frame{細長いFizzBuzz完成}<
+    +code-block-php(fizzbuzz-stretched-4);
+  >
+
+  +frame{細長いFizzBuzz完成}<
+    +code-block-php(fizzbuzz-stretched-5);
+  >
+
+  +frame{細長いFizzBuzz完成}<
+    +code-block-php(fizzbuzz-stretched-6);
+  >
+
+  +frame{細長いFizzBuzz完成}<
+    +code-block-php(fizzbuzz-stretched-7);
+    +p{
+      \emph{完成！}
+    }
+  >
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  +frame{そしてその先へ......}<
+    +fig-center(vconcat ?:(align-center) [
+      gap 100pt;
+      textbox{この縛りの下で、どのくらい複雑なプログラムが書けるのか？};
+    ]);
+  >
+
+  +frame{そしてその先へ......}<
+    +fig-center(vconcat ?:(align-center) [
+      gap 100pt;
+      textbox{この縛りの下で、どのくらい複雑なプログラムが書けるのか？};
+      gap 50pt;
+      textbox{任意のプログラムを動かせる！};
+    ]);
+  >
+
+  +frame{そしてその先へ......}<
+    +fig-center(vconcat ?:(align-center) [
+      gap 100pt;
+      textbox{この縛りの下で、どのくらい複雑なプログラムが書けるのか？};
+      gap 50pt;
+      textbox{任意のプログラムを動かせる！};
+      gap 20pt;
+      textbox{\emph{Laravel}を動かせる！};
+    ]);
+  >
+
+  +frame{そしてその先へ......}<
+    +fig-center(vconcat ?:(align-center) [
+      gap 100pt;
+      textbox{任意のプログラムを動かそうとしたときの壁};
+      gap 20pt;
+      textbox{\inline-code(`eval()`);は関数ではない};
+    ]);
+  >
+
+  +frame{おわりに}<
+    +fig-center(vconcat ?:(align-center) [
+      gap 100pt;
+      textbox{続きは\emph{PHPerKaigi 2023}で};
+    ]);
+  >
+>
