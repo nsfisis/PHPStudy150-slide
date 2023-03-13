@@ -396,7 +396,7 @@ document '<
       gap 100pt;
       textbox{この縛りの下で、どのくらい複雑なプログラムが書けるのか？};
       gap 50pt;
-      textbox{任意のプログラムを動かせる！};
+      textbox{任意のプログラムが書ける！};
     ]);
   >
 
@@ -405,9 +405,9 @@ document '<
       gap 100pt;
       textbox{この縛りの下で、どのくらい複雑なプログラムが書けるのか？};
       gap 50pt;
-      textbox{任意のプログラムを動かせる！};
+      textbox{任意のプログラムが書ける！};
       gap 20pt;
-      textbox{\emph{Laravel}でも動かせる};
+      textbox{\emph{Laravel}も動かせる};
     ]);
   >
 
