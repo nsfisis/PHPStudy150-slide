@@ -298,7 +298,7 @@ document '<
     +code-block-php(fizzbuzz-1);
     +listing{
       * \inline-code(`for`);は\inline-code(`array_walk`);と\inline-code(`range`);に
-      * \inline-code(`echo`);は\inline-code(`pritnf`);に
+      * \inline-code(`echo`);は\inline-code(`printf`);に
       * \inline-code(`<?php`);は\inline-code(`<?`);に (要: \inline-code(`short_open_tag`);オプション)
     }
   >
