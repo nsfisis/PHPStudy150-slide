@@ -268,7 +268,7 @@ document '<
       * ほとんどのキーワードが書けない
         ** 書けるのは\inline-code(`as`);、\inline-code(`do`);、\inline-code(`fn`);、\inline-code(`if`);、\inline-code(`or`);のみ
       * ほとんどの関数が呼べない
-        ** 呼べるのは\inline-code(`_`); (\inline-code(`gettext`);の別名)、\inline-code(`pi`);のみ
+        ** 呼べるのは\inline-code(`_`); (\inline-code(`gettext`);の別名)、\inline-code(`pi`);、\inline-code(`dl`);のみ
       * 空でない文字列が書けない
         ** クォート、中身の文字、クォート、で最低3文字必要
     }
